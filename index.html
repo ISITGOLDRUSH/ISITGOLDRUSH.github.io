@@ -3,13 +3,13 @@ html<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gold Rush</title>
+    <title>Gold Rush Time</title>
     <style>
         body {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             font-family: Arial, sans-serif;
         }
@@ -17,24 +17,56 @@ html<!DOCTYPE html>
             font-size: 2em;
         }
         h2 {
-            font-size: 4em;
+            font-size: 3em;
+        }
+        p {
+            font-size: 1.5em;
         }
     </style>
 </head>
 <body>
     <h1>Is it Gold Rush?</h1>
     <h2 id="goldRushStatus"></h2>
+    <p id="nextGoldRush"></p>
 
     <script>
         function checkGoldRush() {
             const now = new Date();
             const utcHours = now.getUTCHours();
-            const isGoldRush = (utcHours >= 17 && utcHours < 18) || (utcHours >= 1 && utcHours < 2);
-            return isGoldRush ? "YES" : "NO";
+            const utcMinutes = now.getUTCMinutes();
+            const currentTime = utcHours * 60 + utcMinutes;
+
+            const goldRushStart1 = 17 * 60; // 17:00 UTC in minutes
+            const goldRushEnd1 = 18 * 60; // 18:00 UTC in minutes
+            const goldRushStart2 = 1 * 60; // 01:00 UTC in minutes
+            const goldRushEnd2 = 2 * 60; // 02:00 UTC in minutes
+
+            let isGoldRush = false;
+            let nextGoldRushTime;
+
+            if ((currentTime >= goldRushStart1 && currentTime < goldRushEnd1) ||
+                (currentTime >= goldRushStart2 && currentTime < goldRushEnd2)) {
+                isGoldRush = true;
+            } else {
+                const minutesInDay = 24 * 60;
+                const timeUntilNextGoldRush1 = (goldRushStart1 - currentTime + minutesInDay) % minutesInDay;
+                const timeUntilNextGoldRush2 = (goldRushStart2 - currentTime + minutesInDay) % minutesInDay;
+                const timeUntilNextGoldRush = Math.min(timeUntilNextGoldRush1, timeUntilNextGoldRush2);
+
+                const hoursUntilNext = Math.floor(timeUntilNextGoldRush / 60);
+                const minutesUntilNext = timeUntilNextGoldRush % 60;
+
+                nextGoldRushTime = `Next Gold Rush in ${hoursUntilNext} hours and ${minutesUntilNext} minutes.`;
+            }
+
+            document.getElementById('goldRushStatus').innerText = isGoldRush ? 'YES' : 'NO';
+            if (!isGoldRush) {
+                document.getElementById('nextGoldRush').innerText = nextGoldRushTime;
+            }
         }
 
-        document.getElementById('goldRushStatus').innerText = checkGoldRush();
+        checkGoldRush();
+        setInterval(checkGoldRush, 60000); // Update every minute
     </script>
 </body>
 </html>
-
